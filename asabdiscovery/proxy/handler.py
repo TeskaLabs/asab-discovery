@@ -2,8 +2,9 @@ import logging
 
 import aiohttp
 import aiohttp.web
-import asab.web.auth
 
+import asab
+import asab.web.auth
 import asab.web.rest
 
 #
@@ -12,12 +13,20 @@ L = logging.getLogger(__name__)
 
 #
 
+asab.Config.add_defaults({
+	"proxy": {
+		# Allowed keys for the discovery locate function inside the proxy separated by ,
+		"allowed_keys": "service_id,instance_id,baseline_id,correlator_id",
+	}
+})
+
 
 class ProxyWebHandler:
 
 	def __init__(self, app, discovery_service):
 		self.App = app
 		self.DiscoveryService = discovery_service
+		self.ProxyAllowedKeys = asab.Config["proxy"]["allowed_keys"].split(',')
 
 		web_app = app.WebContainer.WebApp
 
@@ -32,11 +41,17 @@ class ProxyWebHandler:
 
 	async def proxy_by_key(self, request):
 		key = request.match_info["key"]
+
+		# For safety purposes
+		if key not in self.ProxyAllowedKeys:
+			return asab.web.rest.json_response(
+				request, {"result": "KEY-NOT-ALLOWED"}, status=405
+			)
+
 		value = request.match_info["value"]
 		proxy_path = request.match_info["proxy_path"]
 
 		# Locate URLs using the key-value pair
-		# TODO: Is this safe?
 		urls = await self.DiscoveryService.locate(**{key: value})
 
 		if not urls:
@@ -47,10 +62,12 @@ class ProxyWebHandler:
 		# Extract request details
 		method = request.method
 		query_params = request.query_string
-		body = await request.read()
 		headers = {key: value for key, value in request.headers.items()}
 
-		# Forward the request to the first available URL
+		# Use streaming for the request body
+		# TODO: This needs to be tested
+		body_stream = request.content.iter_any()
+
 		for url in urls:
 			url_with_endpoint = f"{url}/{proxy_path}"
 
@@ -60,21 +77,27 @@ class ProxyWebHandler:
 			try:
 
 				async with aiohttp.ClientSession() as session:
+
 					async with session.request(
 						method=method,
 						url=url_with_endpoint,
 						headers=headers,
-						data=body,
+						data=body_stream,
+						proxy=None,  # Explicitly disable proxy for this request
+
 					) as resp:
-
-						# Forward the response back to the client
-						payload = await resp.read()
-
-						return aiohttp.web.Response(
-							body=payload,  # Use the raw payload as the body
-							status=resp.status,  # Forward the status code from the proxied response
-							headers=resp.headers,  # Forward the headers from the proxied response
+						# Stream the response back to the client
+						response = aiohttp.web.StreamResponse(
+							status=resp.status, headers=resp.headers
 						)
+
+						await response.prepare(request)
+
+						async for chunk in resp.content.iter_chunked(1024):
+							await response.write(chunk)
+
+						await response.write_eof()
+						return response
 
 			except aiohttp.client_exceptions.ClientConnectorError:
 				# If this url could not be connected to, try another one
