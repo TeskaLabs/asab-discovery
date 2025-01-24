@@ -1,0 +1,139 @@
+# .gitlab-ci.yaml
+stages:
+  - test
+  - build
+
+
+test py39:
+  stage: test
+  image: pcr.teskalabs.com/python:3.9
+  tags:
+  - docker
+  script:
+    - apt-get update
+    - pip install --upgrade pip
+    - pip install asab
+
+test py310:
+  stage: test
+  image: pcr.teskalabs.com/python:3.10
+  tags:
+  - docker
+  script:
+    - apt-get update
+    - pip install --upgrade pip
+    - pip install asab
+
+
+test py311:
+  stage: test
+  image: pcr.teskalabs.com/python:3.11
+  tags:
+  - docker
+  script:
+    - apt-get update
+    - pip install --upgrade pip
+    - pip install asab
+
+
+test flake:
+  stage: test
+  image: pcr.teskalabs.com/python:3.11
+  tags:
+  - docker
+  script:
+    - apt-get update
+    - pip install --upgrade pip
+    - pip install flake8
+    - python3 -m flake8 asabdiscovery
+
+
+build docker:
+  stage: build
+  image: pcr.teskalabs.com/docker:24
+
+  tags:
+  # The shell Gitlab runner has to be used for this
+  - shell
+
+  variables:
+    GIT_SUBMODULE_STRATEGY: recursive
+
+  only:
+    # Execute only for master branch
+    - master
+
+  before_script:
+    - docker info
+    # We want to run in the clean environment
+    - docker system prune -f
+
+  script:
+    - docker build -t "$DOCKER_REGISTRY_IMAGE" --no-cache
+      --build-arg CI_COMMIT_BRANCH
+      --build-arg CI_COMMIT_TAG
+      --build-arg CI_COMMIT_REF_NAME
+      --build-arg CI_COMMIT_SHA
+      --build-arg CI_COMMIT_TIMESTAMP
+      --build-arg CI_JOB_ID
+      --build-arg CI_PIPELINE_CREATED_AT
+      --build-arg CI_RUNNER_ID
+      --build-arg CI_RUNNER_EXECUTABLE_ARCH
+      --build-arg GITHUB_HEAD_REF
+      --build-arg GITHUB_JOB
+      --build-arg GITHUB_SHA
+      --build-arg GITHUB_REPOSITORY
+      .
+
+    - docker login -u "$DOCKER_USER" -p "$DOCKER_PASSWORD" "$DOCKER_REGISTRY"
+    - docker push $DOCKER_REGISTRY_IMAGE
+
+  after_script:
+    # Clean-up
+    - docker container prune -f > /dev/null 2> /dev/null
+    - docker image prune -a -f > /dev/null 2> /dev/null
+
+build docker-tags:
+  stage: build
+  image: pcr.teskalabs.com/docker:24
+
+  variables:
+    GIT_SUBMODULE_STRATEGY: normal
+
+  tags:
+    # The shell Gitlab runner has to be used for this
+    - shell
+
+  only:
+    - tags
+
+  before_script:
+    - docker info
+    # We want to run in the clean environment
+    - docker system prune -f
+
+  script:
+    - docker build -t "${CI_COMMIT_TAG}" --no-cache
+      --build-arg CI_COMMIT_BRANCH
+      --build-arg CI_COMMIT_TAG
+      --build-arg CI_COMMIT_REF_NAME
+      --build-arg CI_COMMIT_SHA
+      --build-arg CI_COMMIT_TIMESTAMP
+      --build-arg CI_JOB_ID
+      --build-arg CI_PIPELINE_CREATED_AT
+      --build-arg CI_RUNNER_ID
+      --build-arg CI_RUNNER_EXECUTABLE_ARCH
+      --build-arg GITHUB_HEAD_REF
+      --build-arg GITHUB_JOB
+      --build-arg GITHUB_SHA
+      --build-arg GITHUB_REPOSITORY
+      .
+
+    - docker tag "${CI_COMMIT_TAG}" "${DOCKER_REGISTRY_IMAGE}:${CI_COMMIT_TAG}"
+    - docker login -u "$DOCKER_USER" -p "$DOCKER_PASSWORD" "$DOCKER_REGISTRY"
+    - docker push "${DOCKER_REGISTRY_IMAGE}:${CI_COMMIT_TAG}"
+
+  after_script:
+    # Clean-up
+    - docker container prune -f > /dev/null 2> /dev/null
+    - docker image prune -a -f > /dev/null 2> /dev/null
