@@ -12,7 +12,7 @@ from .proxy.handler import ProxyWebHandler
 
 asab.Config.add_defaults({
 	"web": {
-		"listen": "8959",  # Well-known port of asab discovery
+		"listen": "8998",  # Well-known port of asab discovery
 	},
 	"auth": {
 		"public_keys_url": "http://seacat-auth.service_id.asab/.well-known/jwks.json"
