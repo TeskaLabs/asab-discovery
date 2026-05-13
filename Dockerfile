@@ -34,9 +34,10 @@ RUN apk add --no-cache \
 
 RUN pip3 install --upgrade pip
 RUN pip3 install --no-cache-dir jinja2 "pygit2<1.12" aiohttp aiozk whoosh pyyaml sentry-sdk
-RUN pip3 install "asab[authz] @ git+https://github.com/TeskaLabs/asab.git"
 
 RUN pip3 install --break-system-packages --no-cache-dir git+https://github.com/TeskaLabs/kazoo.git
+
+RUN pip3 install "asab[authz] @ git+https://github.com/TeskaLabs/asab.git"
 
 RUN mkdir -p /app/asab-discovery
 
