@@ -1,0 +1,28 @@
+meta {
+  name: Proxy by service_id (POST)
+  type: http
+  seq: 3
+}
+
+post {
+  url: {{BASE_URL}}/~/service_id/{{SERVICE_ID}}/{{TENANT}}/api/example
+  body: json
+  auth: inherit
+}
+
+headers {
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "example": "payload forwarded to the backend"
+  }
+}
+
+docs {
+  Forward a POST request with a JSON body to a microservice located by service_id.
+
+  The proxy preserves the HTTP method, headers, query string, and body.
+  Adjust the proxy_path segment (here /api/example) to match the target API.
+}

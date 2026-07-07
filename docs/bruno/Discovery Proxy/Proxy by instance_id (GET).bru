@@ -1,0 +1,19 @@
+meta {
+  name: Proxy by instance_id (GET)
+  type: http
+  seq: 2
+}
+
+get {
+  url: {{BASE_URL}}/~/instance_id/{{INSTANCE_ID}}/{{TENANT}}/asab/v1/manifest
+  body: none
+  auth: inherit
+}
+
+docs {
+  Forward a GET request to a specific microservice instance.
+
+  Use instance_id when you need to reach one particular pod or node rather
+  than any instance of a service. Replace INSTANCE_ID and TENANT with values
+  from your cluster.
+}

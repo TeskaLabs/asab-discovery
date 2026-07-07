@@ -1,0 +1,21 @@
+meta {
+  name: Proxy by service_id (GET)
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{BASE_URL}}/~/service_id/{{SERVICE_ID}}/{{TENANT}}/asab/v1/config
+  body: none
+  auth: inherit
+}
+
+docs {
+  Forward a GET request to a microservice located by service_id.
+
+  The discovery service resolves service_id to a running instance in ZooKeeper
+  and proxies the request to {backend}/{TENANT}/asab/v1/config.
+
+  Replace SERVICE_ID and TENANT with values from your cluster.
+  Optionally send Authorization to pass credentials through to the backend.
+}
