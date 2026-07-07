@@ -316,7 +316,7 @@ class ProxyWebHandler:
 			except aiohttp.client_exceptions.ClientConnectorError as e:
 				# If this url could not be connected to, try another one
 				last_exception = e
-				L.warning(
+				L.debug(
 					"Discovery proxy could not connect to a backend instance; trying the next discovered instance if available. "
 					"This may indicate a temporarily unreachable host or stale discovery data.",
 					struct_data=_request_struct_data(
