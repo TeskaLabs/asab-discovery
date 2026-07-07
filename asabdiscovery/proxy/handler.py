@@ -158,26 +158,26 @@ class ProxyWebHandler:
 		tags: ['Discovery Proxy']
 		parameters:
 			- name: key
-			  in: path
-			  required: true
-			  description: Locate parameter name used to find backend instances.
-			  schema:
-			    type: string
-			    enum: [service_id, instance_id, baseline_id, correlator_id]
+				in: path
+				required: true
+				description: Locate parameter name used to find backend instances.
+				schema:
+					type: string
+					enum: [service_id, instance_id, baseline_id, correlator_id]
 			- name: value
-			  in: path
-			  required: true
-			  description: Identifier value for the chosen locate key (for example `asab-config` when key is `service_id`).
-			  schema:
-			    type: string
-			    example: asab-config
+				in: path
+				required: true
+				description: Identifier value for the chosen locate key (for example `asab-config` when key is `service_id`).
+				schema:
+					type: string
+					example: asab-config
 			- name: proxy_path
-			  in: path
-			  required: true
-			  description: Remainder of the URL path forwarded to the backend after the locate segment. Often starts with a tenant name.
-			  schema:
-			    type: string
-			    example: mytenant/asab/v1/config
+				in: path
+				required: true
+				description: Remainder of the URL path forwarded to the backend after the locate segment. Often starts with a tenant name.
+				schema:
+					type: string
+					example: mytenant/asab/v1/config
 		responses:
 			'200':
 				description: Successful response streamed from the backend service. Content type and body depend on the target API.
