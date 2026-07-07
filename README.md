@@ -12,7 +12,7 @@ Operators can roll out new versions, replace failed nodes, or add capacity witho
 Clients talk to a stable name; the discovery layer maps it to whatever is running right now.
 When several instances exist, callers can fail over to the next one if the first is unreachable.
 
-In the [ASAB](https://github.com/TeskaLabs/asab) ecosystem, **[ZooKeeper](https://zookeeper.apache.org/)** is the shared coordination store for the cluster.
+In the [ASAB](https://github.com/TeskaLabs/asab) ecosystem, **[Apache ZooKeeper](https://zookeeper.apache.org/)** is the shared coordination store for the cluster.
 Running services advertise themselves under a well-known path; discovery consumers watch that registry and refresh their view as instances come and go.
 
 This repository provides the HTTP proxy for that process.
