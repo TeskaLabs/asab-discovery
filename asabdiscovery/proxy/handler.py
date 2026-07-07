@@ -4,7 +4,6 @@ import aiohttp
 import aiohttp.web
 
 import asab
-import asab.web.auth
 import asab.web.rest
 
 #
@@ -303,7 +302,7 @@ class ProxyWebHandler:
 
 						await response.write_eof()
 
-						L.info(
+						L.debug(
 							"Discovery proxy request forwarded successfully to a backend instance.",
 							struct_data=_request_struct_data(
 								request,
