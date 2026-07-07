@@ -1,6 +1,6 @@
 # CHANGELOG
 
-## v25.16
+## v26.28
 
 ### Features
 - OpenAPI documentation for the discovery proxy endpoint, available at `GET /doc`
