@@ -21,7 +21,6 @@ The proxy resolves a locate key (for example `service_id`) to one or more backen
 Responses are streamed back to the caller.
 
 This microservice is tightly bound to the [ASAB DiscoveryService](https://github.com/TeskaLabs/asab/blob/master/asab/api/discovery.py), which implements the discovery and advertisement logic on top of ZooKeeper and resolves locate keys to backend URLs.
-ASAB microservices use the same discovery layer in-process; **asab-discovery** exposes it over HTTP for browsers, external tools, and other services that are not part of the ASAB runtime.
 
 
 ## Running
