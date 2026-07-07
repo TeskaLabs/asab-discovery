@@ -48,6 +48,13 @@ def _tenant_from_proxy_path(proxy_path):
 	return proxy_path.split("/", 1)[0] or None
 
 
+def _sanitize_url_for_log(url):
+	"""
+	Return a URL safe for structured logging by removing the query string.
+	"""
+	return url.partition("?")[0]
+
+
 class ProxyWebHandler:
 	"""
 	Discovery proxy — forward HTTP requests to cluster microservices.
@@ -269,7 +276,8 @@ class ProxyWebHandler:
 			if query_params:
 				url_with_endpoint = f"{url_with_endpoint}?{query_params}"
 
-			attempted_urls.append(url_with_endpoint)
+			url_for_log = _sanitize_url_for_log(url_with_endpoint)
+			attempted_urls.append(url_for_log)
 
 			try:
 
@@ -303,7 +311,7 @@ class ProxyWebHandler:
 								locate_value=value,
 								proxy_path=proxy_path,
 								tenant=tenant,
-								target_url=url_with_endpoint,
+								target_url=url_for_log,
 								backend_url=url,
 								attempt=attempt_index,
 								attempts_total=len(urls_list),
@@ -325,7 +333,7 @@ class ProxyWebHandler:
 						locate_value=value,
 						proxy_path=proxy_path,
 						tenant=tenant,
-						target_url=url_with_endpoint,
+						target_url=url_for_log,
 						backend_url=url,
 						attempt=attempt_index,
 						attempts_total=len(urls_list),
@@ -340,7 +348,7 @@ class ProxyWebHandler:
 				"Discovery proxy could not reach any backend instance for the requested service. "
 				"Discovered instances exist but all connection attempts failed. "
 				"Verify backend host reachability, firewall rules, and that advertised web ports in ZooKeeper are correct.",
-				exc_info=last_exception,
+				exc_info=(type(last_exception), last_exception, last_exception.__traceback__),
 				struct_data=_request_struct_data(
 					request,
 					locate_key=key,
