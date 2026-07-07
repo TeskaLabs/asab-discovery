@@ -191,16 +191,6 @@ class ProxyWebHandler:
 								result:
 									type: string
 									example: NOT-FOUND
-			'405':
-				description: The locate key in the URL is not allowed by the proxy configuration.
-				content:
-					application/json:
-						schema:
-							type: object
-							properties:
-								result:
-									type: string
-									example: KEY-NOT-ALLOWED
 		"""
 		key = request.match_info["key"]
 		value = request.match_info["value"]
@@ -220,8 +210,6 @@ class ProxyWebHandler:
 					proxy_path=proxy_path,
 					tenant=tenant,
 					allowed_locate_keys=self.ProxyAllowedKeys,
-					http_status=405,
-					result="KEY-NOT-ALLOWED",
 				),
 			)
 			return asab.web.rest.json_response(
@@ -229,7 +217,7 @@ class ProxyWebHandler:
 				{
 					"result": "KEY-NOT-ALLOWED"
 				},
-				status=405
+				status=404
 			)
 
 		# Locate URLs using the key-value pair
@@ -246,8 +234,6 @@ class ProxyWebHandler:
 					locate_value=value,
 					proxy_path=proxy_path,
 					tenant=tenant,
-					http_status=404,
-					result="NOT-FOUND",
 				),
 			)
 			return asab.web.rest.json_response(
@@ -315,7 +301,6 @@ class ProxyWebHandler:
 								attempt=attempt_index,
 								attempts_total=len(urls_list),
 								backend_status=resp.status,
-								result="OK",
 							),
 						)
 						return response
@@ -357,8 +342,6 @@ class ProxyWebHandler:
 					attempted_urls=attempted_urls,
 					attempts_total=len(urls_list),
 					exception_type=last_exception.__class__.__name__,
-					http_status=404,
-					result="NOT-FOUND",
 				),
 			)
 
