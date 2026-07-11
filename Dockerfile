@@ -33,7 +33,7 @@ RUN apk add --no-cache \
   g++
 
 RUN pip3 install --break-system-packages --upgrade pip
-RUN pip3 install --break-system-packages --no-cache-dir jinja2 "pygit2<1.12" aiohttp aiozk whoosh pyyaml sentry-sdk
+RUN pip3 install --break-system-packages --no-cache-dir jinja2 pygit2 aiohttp aiozk whoosh pyyaml sentry-sdk
 
 RUN pip3 install --break-system-packages --no-cache-dir git+https://github.com/TeskaLabs/kazoo.git
 
