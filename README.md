@@ -1,6 +1,6 @@
-# asab-discovery
+# ASAB Discovery
 
-Discovery microservice that forwards HTTP requests to cluster microservices.
+ASAB Discovery is a microservice that forwards HTTP requests to cluster microservices.
 
 In a distributed cluster, services are started, stopped, scaled, and moved across nodes.
 Their host names and ports change over time, so hard-coding backend addresses in every client does not scale.

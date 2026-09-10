@@ -1,5 +1,12 @@
 # CHANGELOG
 
+## v26.37
+
+### Infrastructure
+- Upgrade container base image from Alpine 3.18 to Alpine 3.22 ([#4](https://github.com/TeskaLabs/asab-discovery/pull/4))
+- Update runtime to Python 3.12 and adjust pip installation for system packages ([#4](https://github.com/TeskaLabs/asab-discovery/pull/4))
+- Remove upper version constraint on pygit2 in Dockerfile
+
 ## v26.28
 
 ### Features
