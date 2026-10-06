@@ -37,7 +37,7 @@ RUN pip3 install --break-system-packages --no-cache-dir jinja2 pygit2 aiohttp ai
 
 RUN pip3 install --break-system-packages --no-cache-dir git+https://github.com/TeskaLabs/kazoo.git
 
-RUN pip3 install --break-system-packages "asab[authz] @ git+https://github.com/TeskaLabs/asab.git@v26.37"
+RUN pip3 install --break-system-packages "asab[authz] @ git+https://github.com/TeskaLabs/asab.git@v26.40.01"
 
 RUN mkdir -p /app/asab-discovery
 

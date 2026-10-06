@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## Release Candidate
+
+### Enhancement
+- Use ASAB v26.40.01 in Docker.
+
 ## v26.37
 
 ### Infrastructure
