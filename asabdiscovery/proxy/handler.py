@@ -1,9 +1,11 @@
 import logging
+import re
 
 import aiohttp
 import aiohttp.web
 
 import asab
+import asab.web.auth
 import asab.web.rest
 
 #
@@ -53,6 +55,20 @@ def _sanitize_url_for_log(url):
 	"""
 	return url.partition("?")[0]
 
+# Signed CSV/file downloads (lmio-baseliner, etc.): …/export/{timestamp}/{signature}
+_SIGNED_EXPORT_PROXY_PATH_RE = re.compile(
+	r"^.+/export/[0-9a-fA-F]+/[0-9a-fA-F]+$",
+)
+
+
+def is_signed_export_proxy_path(proxy_path):
+	"""
+	Return True when proxy_path is a signed export download (not export-signature).
+	"""
+	if not proxy_path:
+		return False
+	return _SIGNED_EXPORT_PROXY_PATH_RE.fullmatch(proxy_path) is not None
+
 
 class ProxyWebHandler:
 	"""
@@ -68,6 +84,12 @@ class ProxyWebHandler:
 		self.ProxyAllowedKeys = asab.Config["proxy"]["allowed_keys"].split(',')
 
 		web_app = app.WebContainer.WebApp
+
+		# Signed export GETs: no JWT at discovery (HMAC verified on backend). Register before catch-all.
+		web_app.router.add_get(
+			r"/~/{key}/{value}/{proxy_path:.+/export/[0-9a-fA-F]+/[0-9a-fA-F]+}",
+			self.proxy_signed_export_by_key,
+		)
 
 		# Add the proxy endpoint(s)
 		# Example: /~/service_id/<service_id>/<tenant>/<object>/<method>
@@ -87,6 +109,20 @@ class ProxyWebHandler:
 			},
 		)
 
+	@asab.web.auth.noauth
+	async def proxy_signed_export_by_key(self, request):
+		"""
+		Forward signed export downloads without JWT; backend verifies HMAC on the path.
+		GET only (separate route). ``export-signature`` uses the authenticated catch-all.
+		"""
+		proxy_path = request.match_info["proxy_path"]
+		if not is_signed_export_proxy_path(proxy_path):
+			return asab.web.rest.json_response(
+				request,
+				{"result": "NOT-FOUND"},
+				status=404,
+			)
+		return await self._proxy_by_key(request)
 
 	async def proxy_by_key(self, request):
 		"""
@@ -192,6 +228,9 @@ class ProxyWebHandler:
 									type: string
 									example: NOT-FOUND
 		"""
+		return await self._proxy_by_key(request)
+
+	async def _proxy_by_key(self, request):
 		key = request.match_info["key"]
 		value = request.match_info["value"]
 		proxy_path = request.match_info["proxy_path"]
