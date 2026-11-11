@@ -88,6 +88,7 @@ class ProxyWebHandler:
 		)
 
 
+	@asab.web.auth.noauth
 	async def proxy_by_key(self, request):
 		"""
 		Forward a request to a discovered microservice instance.
