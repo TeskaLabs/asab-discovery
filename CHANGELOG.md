@@ -1,11 +1,5 @@
 # CHANGELOG
 
-## v26.45
-
-### Features
-
-- Skip JWT on /export path for signed downloads
-
 ## v26.37
 
 ### Infrastructure
