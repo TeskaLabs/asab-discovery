@@ -37,7 +37,7 @@ RUN pip3 install --no-cache-dir jinja2 "pygit2<1.12" aiohttp aiozk whoosh pyyaml
 
 RUN pip3 install --break-system-packages --no-cache-dir git+https://github.com/TeskaLabs/kazoo.git
 
-RUN pip3 install "asab[authz] @ git+https://github.com/TeskaLabs/asab.git"
+RUN pip3 install "asab[authz] @ git+https://github.com/TeskaLabs/asab.git@78939853acddf24082586e330696d6d5326ebd65"
 
 # Security fix for CVE-2026-111943 (eMudhra CA compromise)
 RUN pip3 install --upgrade "pip>=26.2.2" \
