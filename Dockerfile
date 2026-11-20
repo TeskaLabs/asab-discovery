@@ -39,6 +39,10 @@ RUN pip3 install --break-system-packages --no-cache-dir git+https://github.com/T
 
 RUN pip3 install "asab[authz] @ git+https://github.com/TeskaLabs/asab.git"
 
+# Security fix for CVE-2026-111943 (eMudhra CA compromise)
+RUN pip3 install --upgrade "pip>=26.2.2" \
+    && pip3 install --upgrade "certifi>=2026.10.19"
+
 RUN mkdir -p /app/asab-discovery
 
 COPY . /app/asab-discovery
